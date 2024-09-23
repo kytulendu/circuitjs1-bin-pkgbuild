@@ -1,45 +1,50 @@
-# Maintainer: Ali Najafian <AliNajafian81@gmail.com>
-pkgname=circuitjs-bin
-pkgver=2.7.1
+# Based on these AUR
+# - https://aur.archlinux.org/packages/circuitjs1-web-bin
+# - https://aur.archlinux.org/packages/circuitjs1-electron
+# - https://aur.archlinux.org/packages/circuitjs-bin
+#
+# source code: https://github.com/pfalstad/circuitjs1
+
+pkgname=circuitjs1-bin
+pkgver=20201006
 pkgrel=1
-pkgdesc="Falstad Circuit Simulator for Linux. (Real and offline version)"
-arch=(x86_64)
+pkgdesc="Falstad Circuit Simulator."
+arch=('any')
 url="https://www.falstad.com/circuit/"
-license=('GPL')
-depends=()
+license=('GPL2')
+depends=(electron)
 makedepends=()
 checkdepends=()
 optdepends=()
-provides=(circuitjs-bin)
-conflicts=(circuitjs-bin)
+provides=(circuitjs1-bin)
+conflicts=(circuitjs-bin circuitjs1-web)
 options=(!strip)
 
 source=("https://www.falstad.com/circuit/offline/circuitjs1-linux64.tgz"
-		  	https://i.postimg.cc/Y0ZkBmDV/circuitjs.png	  
-		  	circuitjs.desktop)
-sha256sums=('SKIP' 'b3ed46fb30478e7207a557658226be18ae1edacd1ee784cb2089e6eaa9a13716' 'e9cb7b4b74ff97f4a5da500bb7217d2796bbe21f2ed62508b391275adb1e3a14')
-
+   circuitjs.png
+   circuitjs.desktop
+   circuitjs)
+sha256sums=('SKIP'
+   'c19618d234feccc2c0878d244b2b5125df6e45b24d2bcfff1d8289e2cd69fc50'
+   'SKIP'
+   'e2abbfcc8ce9bdcb29e6e1387c2c6d6ac56e1543357cda87542edea20a1a48a4')
 
 package() 
 {
-	cd $srcdir/circuitjs1
-	echo packaging ${pkgname}
-	install -d $pkgdir/opt/circuitjs/
-	install -d ${pkgdir}/usr/bin
-	cp -R "${srcdir}/circuitjs1/." "${pkgdir}/opt/circuitjs/"
-	
-	# create symlink from real opt to bin
-	ln -s /opt/circuitjs/circuitjs1 "${pkgdir}"/usr/bin/circuitjs
-	
-	#integrate the desktop file
-	install -d ${pkgdir}/usr/share/applications/
-	install -m644 ${srcdir}/circuitjs.desktop ${pkgdir}/usr/share/applications/circuitjs.desktop
-	
-	#integrate icons...
-   for res in 32 48 64 128 192 256 512; do
-   	install -d $pkgdir/usr/share/icons/hicolor/${res}x${res}/apps
-   	install -m644 ${srcdir}/circuitjs.png $pkgdir/usr/share/icons/hicolor/${res}x${res}/apps/circuitjs.png
-   done
-   
-	echo done!
+   cd "${srcdir}"/circuitjs1
+   mkdir -p "${pkgdir}/usr/share"
+   cp -r resources/app/war "${pkgdir}/usr/share"
+   mv "${pkgdir}/usr/share/war" "${pkgdir}/usr/share/circuitjs1"
+
+   cd "${srcdir}"
+   mkdir -p "${pkgdir}/usr/bin"
+   cp circuitjs "${pkgdir}/usr/bin/circuitjs"
+   chmod 775 ${pkgdir}/usr/bin/circuitjs
+
+   #integrate the desktop file
+   install -d ${pkgdir}/usr/share/applications/
+   install -m644 ${srcdir}/circuitjs.desktop ${pkgdir}/usr/share/applications/circuitjs.desktop
+
+   #integrate icons
+   install -D -m644 ${srcdir}/circuitjs.png $pkgdir/usr/share/icons/hicolor/512x512/apps/circuitjs.png
 }
